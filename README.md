@@ -12,7 +12,7 @@ A full stack web application project for the CIS*2750 Software Systems Developme
 - **Ajax**
 
 ## Features
-- Upload a SVG file
+- Upload an SVG file
 - Download SVG files
 - Create new SVG files
 - View SVG files
