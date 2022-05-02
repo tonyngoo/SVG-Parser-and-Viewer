@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SVG Image Viewer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CHANGE ME">
+    <meta name="keywords" content="CHANGE ME">
+    <meta name="author" content="CHANGE ME">
+    <!-- Load jquery, bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <!-- Custom CSS End -->
+</head>
+<body>
+    <div class='typewriter d-flex align-items-left'>
+        <div>
+            <h1>
+            <b>SVG Image Viewer</b>
+            </h1>
+        </div>
+    </div>
+
+    <div class='container'>
+        <h1></h1>
+    </div>
+
+    <hr>
+
+    <div class='container pt-4 pb-4'>
+
+        <!-- Header for file log -->
+        <div class='row pb-2'>
+          <div class='col-md-2'>
+            <h2 class='mb-2'>
+              <b>File Log</b>
+            </h2>
+          </div>
+          <div class='col-md-10'>
+            <form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType='multipart/form-data'>
+              <div class='form-group float-right'>
+                <input type='submit' value='Upload File' class='btn btn-primary pt-2 pb-2'>
+                <input type='file' name='uploadFile' class='btn btn-primary'>
+              </div>
+            </form>
+          </div>
+        </div>
+
+    <!-- File log table -->
+    <div class='scroll-y scrollbar-y' id='fileLogSec'>
+        <table class='table table-bordered table-hover table-curved'>
+          <thead class='thead-light'>
+            <tr>
+              <th>Image (click to download)</th>
+              <th scope='col'>File name (click to download)</th>
+              <th scope='col'>File Size</th>
+              <th scope='col'>Number of Rectangles</th>
+              <th scope='col'>Number of Circles</th>
+              <th scope='col'>Number of Paths</th>
+              <th scope='col'>Number of Groups</th>
+            </tr>
+          </thead>
+          <tbody id='fileLog'>
+            <!-- Table rows go here -->
+          </tbody>
+        </table>
+    </div>
+
+      <hr>
+
+      <div class='statusSection' id='statusSection'>
+        <h2 class='statusHeader'>
+          <b>Alerts</b>
+          <small class='text-muted'>...</small>
+          <hr>
+        </h2>
+      </div>
+
+    <hr>
+    <br>
+    <div class='row pb-200' id = "viewPanelFunctionality">
+      <div class='col-md-3'>
+        <h2>
+          <b>SVG View Panel</b>
+        </h2>
+      </div>
+      <div class="row">
+        <div class="col-md">
+          <button
+            type="button"
+            class="btn btn-primary mr-3 pr-3"
+            data-target="#OtherAttributeButton"
+            id="ShowAttributeData"
+          >
+            Show Attributes
+          </button>
+        </div>
+      </div>
+      <div class="col-md ml-6">
+        <button
+				type="button"
+				class="btn btn-primary mr-3 pr-3"
+				data-target="#editTitleButton"
+				id="editTitleDesc"
+			>
+				Edit Title/Desc
+			</button>
+    </div>
+    <div class="col-md-5 ml-3">
+      <button
+      type="button"
+      class="btn btn-primary mr-5 pr-3"
+      data-target="#editAttributeButton"
+      id="editAttributeID"
+      >
+      Edit Attribute
+      </button>
+    </div>
+    <div class='col-md-5 ml-auto form-group float-right'>
+      <button class='btn btn-primary pt-2 pb-2 float-right' id = "viewButton">View File</button>
+      <select class='form-control form-control-md' id="fileDropdownMenu">
+        <option>Choose file</option>
+        <!-- Files go here -->
+      </select>
+    </div>
+  </div>
+  <br>
+
+		<!-- Bootstrap modal for edit title/description button -->
+		<div
+    class="modal fade"
+    id="editTitleButton"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit title and/or description</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="ContainerForEditButton" class="spaceBetweenButtons">
+            <p>Edit a title, description or both!</p>
+            <p>Ensure that you have selected a file in the drop down menu.</p>
+          </div>
+        </div>
+        <div class="modal-body" id = "editBody">
+          <form>
+            <div class="form-group">
+              <label for="editTitle">Enter a title</label>
+              <input
+                type="text"
+                class="form-control"
+                id="editTitleForm"
+                placeholder="Edit title here"
+              />
+              <br>
+            </div>
+            <div class="form-group">
+              <label for="addCreator">Enter a description</label>
+              <input
+                type="text"
+                class="form-control"
+                id="editDescriptionForm"
+                placeholder="Edit description here"
+              />
+            </div>
+            <button
+            type="button"
+            class="btn btn-primary Button"
+            id="submitEditSVG"
+            data-dismiss="modal"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-primary Button"
+            data-dismiss="modal"
+            onclick="cancelButton()"
+          >
+            Cancel
+          </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+		<!-- Bootstrap modal for Show Other Attribute button -->
+		<div
+			class="modal fade"
+			id="OtherAttributeButton"
+			tabindex="-1"
+			role="dialog"
+			aria-labelledby="exampleModalLabel"
+			aria-hidden="true"
+		>
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Show Shape Attributes</h5>
+						<button
+							type="button"
+							class="close"
+							data-dismiss="modal"
+							aria-label="Close"
+						>
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Please choose a component</p>
+						<div
+							id="ContainerForComponentButtons"
+							class="spaceBetweenButtons"
+						></div>
+					</div>
+					<div class="modal-footer">
+						<button
+							type="button"
+							class="btn btn-primary Button"
+							data-dismiss="modal"
+							id="showAttributeModalPopup"
+							onclick="cancelButton()"
+						>
+							Cancel
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+    		<!-- Bootstrap modal for editing attribute button -->
+		<div
+    class="modal fade"
+    id="editAttributeButton"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit an attribute</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id = "editAttributeBody">
+          <form>
+            <div class="form-group">
+              <label for="enterComponent">Enter Component (SVG, Rectangle, Circle, Path, Group) and #: </label>
+              <input
+                type="text"
+                class="form-control"
+                id="editComponentForm"
+                placeholder="Enter component here (Example: Rectangle 1)"
+              />
+              <br>
+            </div>
+            <div class="form-group">
+              <label for="enterAttriibute">Enter an attribute</label>
+              <input
+                type="text"
+                class="form-control"
+                id="editAttributeForm"
+                placeholder="Enter attribute here"
+              />
+              <br>
+            </div>
+            <div class="form-group">
+              <label for="enterAttributeValue">Enter a value</label>
+              <input
+                type="text"
+                class="form-control"
+                id="editValueForm"
+                placeholder="Enter value here"
+              />
+            </div>
+            <button
+            type="button"
+            class="btn btn-primary Button"
+            id="submitEditAttribute"
+            data-dismiss="modal"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-primary Button"
+            data-dismiss="modal"
+            onclick="cancelButton()"
+          >
+            Cancel
+          </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!--view panel table -->
+    <div class="ViewPanel table-responsive">
+        <table class="table ViewPanelTable table-bordered table">
+          <tbody id = "viewPanelImage">
+            <!-- Insert selected image into table here -->
+          </tbody>
+        <table class="table ViewPanelTable table-bordered table">
+          <thead>
+            <tr class='thead-light' id = "viewPanelHead">
+              <th scope="col">Title</th>
+              <th scope="col">Description</th>
+            </tr>
+          </thead>
+          <tbody class = "viewPanelHeadBody" id = "viewPanelHeadRows">
+            <tr>
+              <th scope="row">No File Selected</th>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table ViewPanelTable table-bordered table">
+            <thead>
+                <tr class='thead-light' id="ViewPanelTable">
+                    <th scope="col">Component</th>
+                    <th scope="col">Summary</th>
+                    <th scope="col">Other Attributes</th>
+                </tr>
+            </thead>
+            <tbody class="ViewPanelBody" id="viewPanelRows">
+                <tr>
+                    <th scope="row">No File Selected</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Creating Buttons for Part 5 (Create SVG, Add Shape, and Scale Shape) -->
+    <hr>
+    <br>
+    <div class='row pb-200' id = "viewPanelFunctionality">
+      <div class='col-md-3'>
+        <h2>
+          <b>SVG Features</b>
+        </h2>
+      </div>
+    </div>
+    <br>
+
+    <div class="row otherButtons">
+      <button
+        type="button"
+        class="btn btn-primary featureButtons col-md-2"
+        data-dismiss="modal"
+        data-toggle="modal"
+        data-target="#createModal"
+        id="createSVG"
+      >
+        Create SVG
+      </button>
+      <div class='modal fade' id='createModal' tabindex='-1' role='dialog' aria-labelledby='modalLabel'
+      aria-hidden='true'>
+      <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5 class='modal-title pt-3 pr-2' id='modalLabel'>Create a new SVG file</h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            <div class='container' id='createBody'>
+            </div>
+            <form class='pt-3' ref='createForm' id='createForm'>
+              <div class='input-group'>
+                <input type='text' class='col-lg-9 ml-3' id="addFilenameForm" placeholder="Enter filename here">
+                <div class='mb-1'>
+                  <small class='pl-3' id='renameSelectedText' style='color:red;'>* Please include the file extension (.svg)</small>
+                </div>
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="addTitleForm" placeholder= "Title">
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="addDescriptionForm" placeholder="Description">
+                <button
+                type="button"
+                class="'col-lg-9 ml-3 mb-2' btn btn-primary Button"
+                id="submitNewSVG"
+                data-dismiss="modal"
+                >
+                  Submit
+                </button>
+                <div>
+                  <small class='pl-3' id='renameSelectedText' style='color:red;'>* All fields are
+                    required</small>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class='modal-footer'>
+            <button type='button' class='btn btn-primary Button' data-dismiss='modal' onclick="cancelButton()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <button
+        type="button"
+        class="btn btn-primary addShapeButtons featureButtons col-md-2 offset-md-1"
+        data-dismiss="modal"
+        data-target="#addRectangleModal"
+        id="addRectangleBtn"
+      >
+        Add Rectangle
+      </button>
+      <div class='modal fade' id='addRectangleModal' tabindex='-1' role='dialog' aria-labelledby='modalLabel'
+      aria-hidden='true'>
+      <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5 class='modal-title pt-3 pr-2' id='modalLabel'>Add a new rectangle</h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            <div class='container' id='createBody'>
+            </div>
+            <p class='pl-3'>Enter values to add a new rectangle</p>
+            <p class='pl-3'>*Must enter positive values for width and height fields</p>
+            <form class='pt-3' ref='createForm' id='createForm'>
+              <div class='input-group'>
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="addXForm" placeholder="x">
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="addYForm" placeholder= "y">
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="addWidthForm" placeholder="width">
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="addHeightForm" placeholder="height">
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="addUnitsForm" placeholder="units">
+                <button
+                type="button"
+                class="'col-lg-9 ml-3 mb-2' btn btn-primary Button"
+                id="submitAddRectangle"
+                data-dismiss="modal"
+                >
+                  Submit
+                </button>
+                <div>
+                  <small class='pl-3' id='renameSelectedText' style='color:red;'>* All fields are
+                    required</small>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class='modal-footer'>
+            <button type='button' class='btn btn-primary Button' data-dismiss='modal' onclick="cancelButton()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-primary addShapeButtons featureButtons col-md-2 offset-md-1"
+      data-dismiss="modal"
+      data-target="#addCircleModal"
+      id="addCircleBtn">
+      Add Circle
+    </button>
+    <div class='modal fade' id='addCircleModal' tabindex='-1' role='dialog' aria-labelledby='modalLabel'
+    aria-hidden='true'>
+    <div class='modal-dialog' role='document'>
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <h5 class='modal-title pt-3 pr-2' id='modalLabel'>Add a new circle</h5>
+          <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+            <span aria-hidden='true'>&times;</span>
+          </button>
+        </div>
+        <div class='modal-body'>
+          <div class='container' id='createBody'>
+          </div>
+          <p class='pl-3'>Enter values to add a new circle</p>
+          <p class='pl-3'>*Must enter a positive value for the radius field</p>
+          <form class='pt-3' ref='createForm' id='createForm'>
+            <div class='input-group'>
+              <input type='text' class='col-lg-9 ml-3 mb-2' id="addCXForm" placeholder="cx">
+              <input type='text' class='col-lg-9 ml-3 mb-2' id="addCYForm" placeholder= "cy">
+              <input type='text' class='col-lg-9 ml-3 mb-2' id="addRadiusForm" placeholder="radius">
+              <input type='text' class='col-lg-9 ml-3 mb-2' id="addCircleUnitsForm" placeholder="units">
+              <button
+              type="button"
+              class="'col-lg-9 ml-3 mb-2' btn btn-primary Button"
+              id="submitAddCircle"
+              data-dismiss="modal"
+              >
+                Submit
+              </button>
+              <div>
+                <small class='pl-3' id='renameSelectedText' style='color:red;'>* All fields are
+                  required, except for units (optional)</small>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class='modal-footer'>
+          <button type='button' class='btn btn-primary Button' data-dismiss='modal' onclick="cancelButton()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+      <button
+        type="button"
+        class="btn btn-primary featureButtons col-md-2 offset-md-1"
+        data-dismiss="modal"
+        data-target="#scaleShapeModal"
+        id="scaleShapeBtn"
+      >
+        Scale Shapes
+      </button>
+      <div class='modal fade' id='scaleShapeModal' tabindex='-1' role='dialog' aria-labelledby='modalLabel'
+      aria-hidden='true'>
+      <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5 class='modal-title pt-3 pr-2' id='modalLabel'>Scale shapes</h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            <div class='container' id='createBody'>
+            </div>
+            <p class='pl-3'>Enter values to scale the rectangles and circles inside the image</p>
+            <p class='pl-3'>Please enter only numerical digits</p>
+            <form class='pt-3' ref='createForm' id='createForm'>
+              <div class='input-group'>
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="scaleRectangleForm" placeholder="Rectangle">
+                <input type='text' class='col-lg-9 ml-3 mb-2' id="scaleCircleForm" placeholder="Circles">
+                <button
+                type="button"
+                class="'col-lg-9 ml-3 mb-2' btn btn-primary Button"
+                id="submitScaleShapes"
+                data-dismiss="modal"
+                >
+                  Submit
+                </button>
+                <div>
+                  <small class='pl-3' id='renameSelectedText' style='color:red;'>* All fields are
+                    required</small>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class='modal-footer'>
+            <button type='button' class='btn btn-primary Button' data-dismiss='modal' onclick="cancelButton()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <br>
+    <!-- Leave me at the bottom of body -->
+    <script src="/index.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
